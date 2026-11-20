@@ -20,8 +20,30 @@ ORANGE = (210, 105, 30)
 BLUE = (45, 95, 170)
 
 FD = "/usr/share/fonts/truetype/dejavu/"
+_FONT_DIRS = [
+    "/usr/share/fonts/truetype/dejavu/",
+    "/usr/share/fonts/truetype/liberation/",
+    "/usr/share/fonts/truetype/noto/",
+    "/usr/share/fonts/",
+]
+_FONT_ALT = {
+    "DejaVuSans.ttf": ["DejaVuSans.ttf", "LiberationSans-Regular.ttf", "NotoSans-Regular.ttf"],
+    "DejaVuSans-Bold.ttf": ["DejaVuSans-Bold.ttf", "LiberationSans-Bold.ttf", "NotoSans-Bold.ttf"],
+    "DejaVuSerif-Bold.ttf": ["DejaVuSerif-Bold.ttf", "LiberationSerif-Bold.ttf", "NotoSerif-Bold.ttf"],
+}
 def F(name, size):
-    return ImageFont.truetype(FD + name, size)
+    for cand in _FONT_ALT.get(name, [name]):
+        for base in _FONT_DIRS:
+            p = base + cand
+            if os.path.exists(p):
+                try:
+                    return ImageFont.truetype(p, size)
+                except Exception:
+                    pass
+    try:
+        return ImageFont.load_default(size=size)
+    except Exception:
+        return ImageFont.load_default()
 def serif(size): return F("DejaVuSerif-Bold.ttf", size)
 def sans(size): return F("DejaVuSans.ttf", size)
 def bold(size): return F("DejaVuSans-Bold.ttf", size)
